@@ -18,11 +18,9 @@
      * Domain Path:         /languages/
      */
 
-    /*if (!defined('WPIND')) {
+    if (!defined('WPIND')) {
         wp_die();
-    }*/
-    
-    define('WP_DEBUG', true);
+    }
 
     // Plugin Version
     if (!defined('MY_YOUTUBE_RECOMMENDATION_VERSION')) {
