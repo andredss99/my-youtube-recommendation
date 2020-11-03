@@ -3,12 +3,81 @@
 if (!class_exists(My_Youtube_Recommendation_Json)) {
     class My_Youtube_Recommendation_Json {
         private $channel_id;
+        private $expiration;
+        private $filename;
+        private $dirname;
+        private $path;
 
-        public function __construct($channel_id) {
+        public function __construct($channel_id, $expiration = 1, $dirname, $filename) {
             $this->channel_id = $channel_id;
+            $this->expiration = $expiration;
+            $this->filename = $filename;
+            $this->dirname = $dirname;
+            $this->path = $this->create_folder_path();
+
+            $ajax_action = 'my_youtube_recommendation_videos';
+            add_action("wp_ajax_$ajax_aciton", array($this, 'write_content'));
+            add_action("wp_ajax_nopriv_$ajax_aciton", array($this, 'write_content'));
         }
 
-        public function from_youtube_feed() {
+        public function write_content() {
+            echo 'Conteúdo via AJAX';
+            wp_die();
+        }
+
+        private function get_content() {
+            if ($this->is_expired()) {
+                $json_content = $this->from_youtube_feed();
+                $this->save_file($json_content);
+            }
+            else {
+                $json_content = $this->from_file();
+            }
+
+            return $json_content;
+        }
+
+        private function is_expired() {
+            $file_expiration_in_hours = $this->expiration;
+
+            $json_file = $this->get_filename_full_path();
+            $json_file_expired = (time() - filemtime($json_file) > ($file_expiration_in_hours * 3600));
+
+            return (!$json_file_expired);
+        }
+
+        private function save_file($json_content) {
+            $json_path = $this->get_filename_full_path();
+            $fp = fopen($json_path, 'w');
+            fwrite($fp, $json_content);
+            fclose($fp);
+        }
+
+        private function from_file() {
+            $json_path = $this->get_filename_full_path();
+            $json = file_get_contents($json_content);
+
+            return $json;
+        }
+
+        private function get_filename_full_path() {
+            return $this->path . '/' . $this->filename;
+        }
+
+        private function create_folder_path() {
+            $upload_dir = wp_upload_dir();
+            if (!empty($upload_dir['basedir'])) {
+                $dirname = $upload_dir['basedir'] . '/' . $this->dirname;
+
+                if (!file_exists($dirname)) {
+                    wp_mkdir_p($dirname);
+                }
+
+                return $dirname;
+            }
+        }
+
+        private function from_youtube_feed() {
             $channel_id = $this->channel_id;
             $feed_url   = "https://www.youtube.com/feeds/videos.xml?channel_id={$channel_id}";
             $response   = wp_remote_get( $feed_url );
