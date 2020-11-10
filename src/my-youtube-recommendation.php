@@ -61,6 +61,19 @@
         require_once MY_YOUTUBE_RECOMMENDATION_PLUGIN_DIR . "includes/class-youtube-recommendation-admin.php";
     }
 
+    $my_yt_rec = new My_Youtube_Recommendation();
+    $channel_id = $my_yt_rec->options["channel_id"];
+    
+    if ($channel_id != "") {
+        $expiration = $my_yt_rec->options["cache_expiration"];
+        $my_yt_rec_json = new My_Youtube_Recommendation_Json(
+            $channel_id,
+            $expiration,
+            MY_YOUTUBE_RECOMMENDATION_PLUGIN_SLUG,
+            MY_YOUTUBE_RECOMMENDATION_JSON_FILENAME
+        );
+    }
+
     $my_yt_rec_admin = new My_Youtube_Recommendation_Admin(
         MY_YOUTUBE_RECOMMENDATION_BASENAME,
         MY_YOUTUBE_RECOMMENDATION_PLUGIN_SLUG,
