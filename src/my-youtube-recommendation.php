@@ -63,7 +63,7 @@
 
     $my_yt_rec = new My_Youtube_Recommendation();
     $channel_id = $my_yt_rec->options["channel_id"];
-    
+
     if ($channel_id != "") {
         $expiration = $my_yt_rec->options["cache_expiration"];
         $my_yt_rec_json = new My_Youtube_Recommendation_Json(
@@ -72,6 +72,8 @@
             MY_YOUTUBE_RECOMMENDATION_PLUGIN_SLUG,
             MY_YOUTUBE_RECOMMENDATION_JSON_FILENAME
         );
+
+        $my_yt_rec_shortcode = new My_Youtube_Recommendation_Shortcode();
     }
 
     $my_yt_rec_admin = new My_Youtube_Recommendation_Admin(
